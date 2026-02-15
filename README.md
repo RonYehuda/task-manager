@@ -14,12 +14,12 @@ A RESTful API for managing tasks built with Spring Boot and PostgreSQL.
 
 ##  Features
 
-- ✅ CRUD operations for tasks
-- ✅ PostgreSQL database integration
-- ✅ Custom JPA queries
-- ✅ Interactive API documentation with Swagger
-- ✅ Dockerized application
-- ✅ RESTful API design
+-  CRUD operations for tasks
+-  PostgreSQL database integration
+-  Custom JPA queries
+-  Interactive API documentation with Swagger
+-  Dockerized application
+-  RESTful API design
 
 ##  Prerequisites
 

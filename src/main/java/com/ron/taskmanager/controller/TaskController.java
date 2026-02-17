@@ -1,8 +1,10 @@
 package com.ron.taskmanager.controller;
 
 import com.ron.taskmanager.model.Task;
+import com.ron.taskmanager.model.User;
 import com.ron.taskmanager.service.TaskService;
 
+import com.ron.taskmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,11 @@ import java.util.Optional;
 @Tag(name = "Task Management",description = "APIs for managing tasks - create, read, update, and delete tasks")
 public class TaskController {
     private final TaskService taskService;
+    private final UserService userService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserService userService) {
         this.taskService = taskService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -38,15 +42,19 @@ public class TaskController {
 
     @PostMapping
     @Operation(summary = "Create a new task")
-    public ResponseEntity<Task> create(@RequestBody Task task){
-        taskService.create(task);
-        return ResponseEntity.status(201).body(task);
+    public ResponseEntity<Task> create(@RequestBody Task task, @RequestParam Long userId){
+        Optional<User> optionalUser = userService.findUserById(userId);
+        if (optionalUser.isPresent()){
+            User user = optionalUser.get();
+            task.setUser(user);
+            taskService.create(task);
+            return ResponseEntity.status(201).body(task);
+        }
+        throw new IllegalArgumentException("User not exist");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> update(
-            @PathVariable Long id,
-            @RequestBody Task task){
+    public ResponseEntity<Task> update(@PathVariable Long id, @RequestBody Task task){
         Task updated = taskService.update(id,task);
         return ResponseEntity.ok(updated);
     }

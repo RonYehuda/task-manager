@@ -1,5 +1,6 @@
 package com.ron.taskmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tasks")
 public class Task {
+    //swagger description
     @Schema(description = "Unique identifier of the task", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +23,20 @@ public class Task {
 
     @Column(nullable = false)
     private boolean completed;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    //converting to JSON: ignore tasks(prevent infinite loop) and password(security)
+    @JsonIgnoreProperties({"tasks", "password"})
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public Task(){}
     public Task (String title, String description, boolean completed) {

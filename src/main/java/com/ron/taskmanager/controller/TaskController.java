@@ -7,6 +7,7 @@ import com.ron.taskmanager.service.TaskService;
 import com.ron.taskmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +27,12 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> tasks(){
-        return ResponseEntity.ok(taskService.findAll());
-
+    public ResponseEntity<Page<Task>> tasks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc" ) String sortDirection){
+        return ResponseEntity.ok(taskService.findAllPaginated(page,size,sortBy,sortDirection));
     }
 
     @GetMapping("/{id}")
@@ -102,5 +106,18 @@ public class TaskController {
     @GetMapping("/ordered")
     public ResponseEntity<List<Task>> allTasksOrderByTitles(){
         return ResponseEntity.ok(taskService.allTasksOrderByTitle());
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<Task>> tasksFilter(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "userId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(required = false) Boolean completed,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String title){
+        Page<Task> taskPage = taskService.findAllFiltered(page, size, sortBy, sortDirection, completed, userId, title);
+        return ResponseEntity.ok(taskPage);
     }
 }

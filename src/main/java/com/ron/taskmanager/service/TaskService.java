@@ -2,6 +2,11 @@ package com.ron.taskmanager.service;
 
 import com.ron.taskmanager.model.Task;
 import com.ron.taskmanager.repository.TaskRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,5 +78,45 @@ public class TaskService {
     public List<Task> allTasksOrderByTitle(){
         return taskRepository.findAllByOrderByTitleAsc();
     }
+
+    public Page<Task> findAllPaginated(int page, int size, String sortBy, String sortDirection){
+        Sort sort = sortDirection.equals("asc") ?
+                Sort.by(sortBy).ascending():
+                Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size,sort);
+        return taskRepository.findAll(pageable);
+    }
+
+    public Page<Task> findAllFiltered(int page, int size, String sortBy, String sortDirection,
+                                      Boolean completed, Long userId, String title){
+        Sort sort = sortDirection.equals("asc") ?
+                Sort.by(sortBy).ascending():
+                Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        // Initializes the specification with a "1=1" condition (always true)
+        //to avoid null issues and allow dynamic chaining of further "AND" predicates.
+        Specification<Task> taskSpecification = (root,
+                                                 query,
+                                                 cb) -> cb.conjunction();
+        if (completed != null){
+            taskSpecification = taskSpecification.and(
+                    (root, query, cb) ->
+                    cb.equal(root.get("completed"), completed));
+        }
+        if (userId != null) {
+            taskSpecification = taskSpecification.and(
+                    (root,query, cb)->
+                    cb.equal(root.get("user").get("id"),userId));
+        }
+        if (title != null){
+            taskSpecification = taskSpecification.and(
+                    ((root, query, cb) ->
+                            cb.like(root.get("title"),"%"+title+"%"))
+            );
+        }
+        return taskRepository.findAll(taskSpecification,pageable);
+    }
+
 }
 

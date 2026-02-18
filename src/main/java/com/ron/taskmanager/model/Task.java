@@ -2,8 +2,10 @@ package com.ron.taskmanager.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tasks")
@@ -23,6 +25,10 @@ public class Task {
 
     @Column(nullable = false)
     private boolean completed;
+
+    @Column
+    @CreatedDate
+    private LocalDate createAt = LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -76,4 +82,8 @@ public class Task {
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
+
+    public LocalDate getCreateAt() {return createAt;}
+
+    public void setCreateAt(LocalDate createAt) {this.createAt = createAt;}
 }

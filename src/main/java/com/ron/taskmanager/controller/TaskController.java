@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,6 +119,17 @@ public class TaskController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String title){
         Page<Task> taskPage = taskService.findAllFiltered(page, size, sortBy, sortDirection, completed, userId, title);
+        return ResponseEntity.ok(taskPage);
+    }
+
+    @GetMapping("/filter/date")
+    public ResponseEntity<Page<Task>> taskDateFilter(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "userId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam LocalDate createAt){
+        Page<Task> taskPage = taskService.findDateFilter(page, size, sortBy, sortDirection, createAt);
         return ResponseEntity.ok(taskPage);
     }
 }

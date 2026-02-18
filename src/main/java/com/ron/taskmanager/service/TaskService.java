@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -116,6 +117,22 @@ public class TaskService {
             );
         }
         return taskRepository.findAll(taskSpecification,pageable);
+    }
+
+    public Page<Task> findDateFilter(int page, int size, String sortBy, String sortDirection, LocalDate createAt){
+        Sort sort = sortDirection.equals("asc")?
+                Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        Specification<Task> spec = ((root, query, cb) -> cb.conjunction());
+
+        if (createAt != null){
+            spec = spec.and(
+                    ((root,
+                      query,
+                      cb) -> cb.greaterThanOrEqualTo(root.get("createAt"),createAt)));
+        }
+        return taskRepository.findAll(spec,pageable);
     }
 
 }

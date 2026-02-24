@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -35,6 +36,9 @@ public class Task {
     //converting to JSON: ignore tasks(prevent infinite loop) and password(security)
     @JsonIgnoreProperties({"tasks", "password"})
     private User user;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<TaskAttachment> taskAttachments;
 
     public User getUser() {
         return user;

@@ -1,0 +1,28 @@
+services:                                          # list of all containers to run
+  postgres:                                        # name of this container (you choose)
+    image: postgres:15                             # use this image from Docker Hub
+    ports:
+      - "5432:5432"                                # expose port 5432 to your machine
+    environment:
+      POSTGRES_DB: taskdb                          # create a database named taskdb
+      POSTGRES_USER: admin                         # create a user named admin
+      POSTGRES_PASSWORD: admin123                  # set the password for that user
+    volumes:
+      - postgres-data:/var/lib/postgresql/data     # save DB data outside the container
+
+  app:
+    build: .                                       # build image from Dockerfile in this folder
+    ports:
+      - "8080:8080"                                # expose port 8080 to your machine
+    environment:
+      DB_NAME: taskdb                              # tell Spring Boot which DB to connect to
+      DB_USERNAME: admin                           # tell Spring Boot which user to use
+      DB_PASSWORD: admin123                        # tell Spring Boot the password
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}      # AWS access key - loaded from .env file
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}            # AWS secret key - loaded from .env file (never commit!)
+    depends_on:
+      - postgres                                   # start postgres before starting app
+    restart: on-failure                            # if app crashes, try again automatically
+
+volumes:
+  postgres-data:                                   # register the volume name so Docker can manage it

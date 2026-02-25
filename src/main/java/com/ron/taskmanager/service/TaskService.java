@@ -2,6 +2,8 @@ package com.ron.taskmanager.service;
 
 import com.ron.taskmanager.model.Task;
 import com.ron.taskmanager.repository.TaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +18,12 @@ import java.util.Optional;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
-
-    public TaskService(TaskRepository taskRepository){
-
+    private final EmailNotificationService emailNotificationService;
+    private final Logger logger = LoggerFactory.getLogger(TaskService.class);
+    public TaskService(TaskRepository taskRepository,
+                       EmailNotificationService emailNotificationService){
         this.taskRepository = taskRepository;
+        this.emailNotificationService =emailNotificationService;
     }
 
     public List<Task> findAll(){
@@ -34,7 +38,20 @@ public class TaskService {
         if (task.getTitle() == null || task.getTitle().isEmpty()){
             throw new IllegalArgumentException("Title can't be empty");
         }
-        return taskRepository.save(task);
+
+        Task taskCreated = taskRepository.save(task);
+
+        if (taskCreated.getUser()==null){
+            logger.error("User not found");
+            throw new IllegalArgumentException("User's email is null");
+        }
+            emailNotificationService
+                    .sendTaskCreatedNotification(
+                            task.getUser().getEmail(),
+                            task.getTitle()
+                    );
+
+        return taskCreated;
     }
 
     public Task update(Long id, Task task){

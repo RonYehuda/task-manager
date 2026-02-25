@@ -15,12 +15,12 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 
 
 @Service
 public class S3Service {
-
     private final String accessKeyId;
     private final String secretKey;
     private final String region;

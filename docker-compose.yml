@@ -20,6 +20,7 @@ services:                                          # list of all containers to r
       DB_PASSWORD: admin123                        # tell Spring Boot the password
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}      # AWS access key - loaded from .env file
       AWS_SECRET_KEY: ${AWS_SECRET_KEY}            # AWS secret key - loaded from .env file (never commit!)
+      JWT_SECRET: ${JWT_SECRET}                    # JWT secret - loaded from .env file
     depends_on:
       - postgres                                   # start postgres before starting app
     restart: on-failure                            # if app crashes, try again automatically

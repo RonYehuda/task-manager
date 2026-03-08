@@ -20,6 +20,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final EmailNotificationService emailNotificationService;
     private final Logger logger = LoggerFactory.getLogger(TaskService.class);
+
     public TaskService(TaskRepository taskRepository,
                        EmailNotificationService emailNotificationService){
         this.taskRepository = taskRepository;
